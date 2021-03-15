@@ -9,6 +9,8 @@ using NativeWebSocket;
 
 using MessagePack;
 using MessagePack.Formatters;
+using MessagePack.Resolvers;
+using PointCloudStreaming.Resolvers;
 
 [MessagePackObject]
 public class PCMessage
@@ -33,6 +35,25 @@ public class PointCloudConnector : MonoBehaviour
     private Vector3[] pcl;
     private Color32[] pcl_color;
 
+    static bool serializerRegistered = false;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Initialize()
+    {
+        if (!serializerRegistered)
+        {
+            StaticCompositeResolver.Instance.Register(
+                 PointCloudStreaming.Resolvers.GeneratedResolver.Instance,
+                 MessagePack.Resolvers.StandardResolver.Instance
+            );
+
+            var option = MessagePackSerializerOptions.Standard.WithResolver(StaticCompositeResolver.Instance);
+
+            MessagePackSerializer.DefaultOptions = option;
+            serializerRegistered = true;
+        }
+    }
+
     // Start is called before the first frame update
     async void Start()
     {
@@ -55,8 +76,7 @@ public class PointCloudConnector : MonoBehaviour
 
         websocket.OnMessage += (bytes) =>
         {
-            var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
-            PCMessage pc = MessagePackSerializer.Deserialize<PCMessage>(bytes, lz4Options);
+            PCMessage pc = MessagePackSerializer.Deserialize<PCMessage>(bytes);
 
             this.size = pc.size;
             this.pcl = MemoryMarshal.Cast<byte, Vector3>(pc.pcl).ToArray();
@@ -99,5 +119,14 @@ public class PointCloudConnector : MonoBehaviour
     {
         return pcl_color;
     }
+
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoadMethod]
+    static void EditorInitialize()
+    {
+        Debug.Log("AAAAAAAAAAA");
+        Initialize();
+    }
+#endif
 
 }
