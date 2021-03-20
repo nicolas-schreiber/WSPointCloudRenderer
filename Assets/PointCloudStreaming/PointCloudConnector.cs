@@ -120,6 +120,11 @@ public class PointCloudConnector : MonoBehaviour
         return pcl_color;
     }
 
+    public int GetSize()
+    {
+        return size;
+    }
+
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoadMethod]
     static void EditorInitialize()

@@ -6,7 +6,8 @@ using System.IO;
 
 public class PointCloudBillboardRenderer : MonoBehaviour
 {
-    public PCConnection subscriber;
+    public PointCloudConnector subscriber;
+    public ComputeShader ClearShader;
 
     public const int THREAD_COUNT = 256;
     public const int POINT_COUNT = 146061;
@@ -34,6 +35,8 @@ public class PointCloudBillboardRenderer : MonoBehaviour
     private ComputeBuffer cb_positions;
     private ComputeBuffer cb_colors;
     private ComputeBuffer cb_quad;
+
+    private int numPoints;
 
     void Start()
     {
@@ -73,19 +76,16 @@ public class PointCloudBillboardRenderer : MonoBehaviour
 
     void OnRenderObject()
     {
-        _material.SetBuffer("positions", cb_positions);
-        _material.SetBuffer("colors", cb_colors);
-        _material.SetBuffer("quad", cb_quad);
-
         _material.SetPass(0);
 
-        Graphics.DrawProceduralNow(MeshTopology.Quads, 6, POINT_COUNT);
+        // Graphics.DrawProceduralNow(MeshTopology.Quads, 6, numPoints);
     }
 
     void UpdateMesh()
     {
         positions = subscriber.GetPCL();
         colors = subscriber.GetPCLColor();
+        numPoints = subscriber.GetSize();
         if (positions == null)
         {   
             return;
@@ -93,6 +93,7 @@ public class PointCloudBillboardRenderer : MonoBehaviour
 
         cb_positions.SetData(positions);
         cb_colors.SetData(colors);
+        
     }
 
     // Update is called once per frame
