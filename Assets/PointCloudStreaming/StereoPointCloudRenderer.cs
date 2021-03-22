@@ -12,6 +12,7 @@ public class StereoPointCloudRenderer : MonoBehaviour
     Mesh mesh;
     MeshRenderer meshRenderer;
     MeshFilter mf;
+    public Shader shader;
 
     // The size, positions and colours of each of the pointcloud
     public float pointSize = 1f;
@@ -28,7 +29,8 @@ public class StereoPointCloudRenderer : MonoBehaviour
         // Give all the required components to the gameObject
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         mf = gameObject.AddComponent<MeshFilter>();
-        meshRenderer.material = new Material(Shader.Find("Custom/GS Billboard"));
+        if(!shader) shader = Shader.Find("Custom/CubesShader");
+        meshRenderer.material = new Material(shader);
         mesh = new Mesh
         {
             // Use 32 bit integer values for the mesh, allows for stupid amount of vertices (2,147,483,647 I think?)
