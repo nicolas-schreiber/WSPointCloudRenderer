@@ -1,20 +1,34 @@
 //UNITY_SHADER_NO_UPGRADE 
 
-Shader "Custom/GS Billboard" 
+Shader "Custom/BallBillboardShader" 
 {
 	Properties
 	{
-		_PointSize("PointSize", Range(0, 0.1)) = 0.01
+        _MainTex("Albedo (RGB)", 2D) = "white" {}
+        _PointSize("PointSize", Range(0, 0.1)) = 0.01
 	}
 
 	SubShader
 	{
 	Pass
 	{
-		// Blend SrcAlpha OneMinusSrcAlpha // Traditional transparency
-		Tags {"RenderType"="Opaque"}
+        Cull Back
+        Lighting Off
+        Zwrite Off
 
-		LOD 200
+        //Blend SrcAlpha OneMinusSrcAlpha
+        //Blend One OneMinusSrcAlpha
+        Blend One One
+        //Blend OneMinusDstColor One
+
+        LOD 200
+
+        Tags
+        {
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
+            "IgnoreProjector" = "True"
+        }
 
 		CGPROGRAM
 #pragma target 5.0
@@ -45,6 +59,7 @@ Shader "Custom/GS Billboard"
 		{
 			float4	pos		: POSITION;
 			float4  col		: COLOR;
+			float2   uv     : TEXCOORD0;
             UNITY_VERTEX_OUTPUT_STEREO 
 		};
 
@@ -54,6 +69,7 @@ Shader "Custom/GS Billboard"
 		// **************************************************************
 
 		float _PointSize;
+		uniform sampler2D _MainTex;
 
 		// **************************************************************
 		// Shader Programs												*
@@ -83,10 +99,10 @@ Shader "Custom/GS Billboard"
             DEFAULT_UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(p[0]);
 
 			float4 quad[4];
+			quad[0] = float4(  0.5, -0.5, 0, 0) * _PointSize;
+			quad[1] = float4(  0.5,  0.5, 0, 0) * _PointSize;
+			quad[2] = float4( -0.5, -0.5, 0, 0) * _PointSize;
 			quad[3] = float4( -0.5,  0.5, 0, 0) * _PointSize;
-			quad[2] = float4( -0.5,  -0.5, 0, 0) * _PointSize;
-			quad[1] = float4( 0.5,  0.5, 0, 0) * _PointSize;
-			quad[0] = float4( 0.5,  -0.5, 0, 0) * _PointSize;
 
 			float4 v[4];
 			v[0] = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, p[0].pos) + quad[0]);
@@ -99,15 +115,19 @@ Shader "Custom/GS Billboard"
             UNITY_TRANSFER_VERTEX_OUTPUT_STEREO (p[0], pIn);
 
 			pIn.pos = v[0];
+            pIn.uv = quad[0] + 0.5f;
 			triStream.Append(pIn);
 
 			pIn.pos = v[1];
+            pIn.uv = quad[1] + 0.5f;
 			triStream.Append(pIn);
 
 			pIn.pos = v[2];
+            pIn.uv = quad[2] + 0.5f;
 			triStream.Append(pIn);
 
 			pIn.pos = v[3];
+            pIn.uv = quad[3] + 0.5f;
 			triStream.Append(pIn);
 		}
 
@@ -115,7 +135,7 @@ Shader "Custom/GS Billboard"
 		float4 FS_Main(FS_INPUT input) : COLOR
 		{
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-			return float4(input.col.z, input.col.y, input.col.x, input.col.w);
+			return tex2D(_MainTex, input.uv) * input.col; //float4(input.col.z, input.col.y, input.col.x, input.col.w);
 		}
 
 		ENDCG

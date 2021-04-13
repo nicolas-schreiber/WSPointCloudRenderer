@@ -29,6 +29,8 @@ namespace PointCloudStreaming.Formatters
         private static global::System.ReadOnlySpan<byte> GetSpan_pcl() => new byte[1 + 3] { 163, 112, 99, 108 };
         // pcl_color
         private static global::System.ReadOnlySpan<byte> GetSpan_pcl_color() => new byte[1 + 9] { 169, 112, 99, 108, 95, 99, 111, 108, 111, 114 };
+        // point_size
+        private static global::System.ReadOnlySpan<byte> GetSpan_point_size() => new byte[1 + 10] { 170, 112, 111, 105, 110, 116, 95, 115, 105, 122, 101 };
 
         public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::PCMessage value, global::MessagePack.MessagePackSerializerOptions options)
         {
@@ -38,13 +40,15 @@ namespace PointCloudStreaming.Formatters
                 return;
             }
 
-            writer.WriteMapHeader(3);
+            writer.WriteMapHeader(4);
             writer.WriteRaw(GetSpan_size());
             writer.Write(value.size);
             writer.WriteRaw(GetSpan_pcl());
             writer.Write(value.pcl);
             writer.WriteRaw(GetSpan_pcl_color());
             writer.Write(value.pcl_color);
+            writer.WriteRaw(GetSpan_point_size());
+            writer.Write(value.point_size);
         }
 
         public global::PCMessage Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -59,6 +63,7 @@ namespace PointCloudStreaming.Formatters
             var __size__ = default(int);
             var __pcl__ = default(byte[]);
             var __pcl_color__ = default(byte[]);
+            var __point_size__ = default(float);
 
             for (int i = 0; i < length; i++)
             {
@@ -84,6 +89,11 @@ namespace PointCloudStreaming.Formatters
 
                         __pcl_color__ = reader.ReadBytes()?.ToArray();
                         continue;
+                    case 10:
+                        if (!global::System.MemoryExtensions.SequenceEqual(stringKey, GetSpan_point_size().Slice(1))) { goto FAIL; }
+
+                        __point_size__ = reader.ReadSingle();
+                        continue;
 
                 }
             }
@@ -93,6 +103,7 @@ namespace PointCloudStreaming.Formatters
                 size = __size__,
                 pcl = __pcl__,
                 pcl_color = __pcl_color__,
+                point_size = __point_size__,
             };
 
             reader.Depth--;

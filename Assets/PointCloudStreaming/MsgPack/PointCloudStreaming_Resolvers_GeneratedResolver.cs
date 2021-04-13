@@ -49,9 +49,10 @@ namespace PointCloudStreaming.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(1)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
             {
-                { typeof(global::PCMessage), 0 },
+                { typeof(global::ImageMessage), 0 },
+                { typeof(global::PCMessage), 1 },
             };
         }
 
@@ -65,7 +66,8 @@ namespace PointCloudStreaming.Resolvers
 
             switch (key)
             {
-                case 0: return new PointCloudStreaming.Formatters.PCMessageFormatter();
+                case 0: return new PointCloudStreaming.Formatters.ImageMessageFormatter();
+                case 1: return new PointCloudStreaming.Formatters.PCMessageFormatter();
                 default: return null;
             }
         }

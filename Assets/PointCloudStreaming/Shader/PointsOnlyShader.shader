@@ -1,5 +1,5 @@
 ﻿
-Shader "Custom/PointCloudShader"
+Shader "Custom/PointsOnlyShader"
 {
 	Properties
 	{

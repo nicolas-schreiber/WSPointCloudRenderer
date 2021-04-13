@@ -70,7 +70,8 @@ public class StereoPointCloudRenderer : MonoBehaviour
     {
         transform.position = offset.position;
         transform.rotation = offset.rotation;
-        meshRenderer.material.SetFloat("_Size", pointSize);
+        float msgPointSize = subscriber.getPointSize();
+        meshRenderer.material.SetFloat("_PointSize", msgPointSize < 0 ? pointSize : msgPointSize );
         UpdateMesh();
     }
 }

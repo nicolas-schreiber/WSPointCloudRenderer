@@ -1,6 +1,6 @@
 //UNITY_SHADER_NO_UPGRADE 
 
-Shader "Custom/CubesShader" 
+Shader "Custom/CubesFromQuadsShader" 
 {
 	Properties
 	{
@@ -122,7 +122,7 @@ Shader "Custom/CubesShader"
 			FS_INPUT pIn;;
 			pIn.col = p[0].col;
             UNITY_TRANSFER_VERTEX_OUTPUT_STEREO (p[0], pIn);
-            for(int i = 0; i < 24; i++) {
+            for(uint i = 0; i < 24; i++) {
 			    pIn.pos = UnityObjectToClipPos(p[0].pos + quad[i]);
 			    triStream.Append(pIn);
 				

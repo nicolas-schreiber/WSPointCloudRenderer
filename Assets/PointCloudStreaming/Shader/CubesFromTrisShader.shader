@@ -1,4 +1,4 @@
-Shader "Custom/CubeShader" 
+Shader "Custom/CubesFromTrisShader" 
 {        
     Properties 
     {
@@ -11,6 +11,18 @@ Shader "Custom/CubeShader"
         
         Pass 
         {
+            Cull Back
+            // Lighting Off
+            // Zwrite Off
+            
+			// Blend One One
+
+			Tags
+			{
+				"RenderType" = "Transparent"
+				"Queue" = "Transparent"
+				"IgnoreProjector" = "True"
+			}
             CGPROGRAM
             
             #pragma target 5.0
